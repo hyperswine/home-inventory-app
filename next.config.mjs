@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove static export for App Hosting
-  experimental: {
-    serverComponentsExternalPackages: []
-  }
+  // Optimized for Vercel deployment
+  // Firebase client SDK works great with Vercel's edge runtime
 };
 
 export default nextConfig;
