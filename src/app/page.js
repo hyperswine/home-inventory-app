@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
-import { Search, Plus, Edit, Trash2, MapPin, Tag, Loader } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, MapPin, Tag, Loader, RefreshCw } from 'lucide-react'
 import { useInventoryItems } from '../hooks/useFirestore'
 
 // Quick tag suggestions
@@ -35,7 +35,7 @@ const ItemForm = ({ item, onSave, onCancel, onUpdateField, isEditing = false, lo
               type="text"
               value={item.name}
               onChange={(e) => onUpdateField('name', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500"
               placeholder="e.g., USB-C Cable"
               disabled={loading}
             />
@@ -48,7 +48,7 @@ const ItemForm = ({ item, onSave, onCancel, onUpdateField, isEditing = false, lo
                 type="text"
                 value={item.location}
                 onChange={(e) => onUpdateField('location', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500"
                 placeholder="e.g., Room 2"
                 disabled={loading}
               />
@@ -60,7 +60,7 @@ const ItemForm = ({ item, onSave, onCancel, onUpdateField, isEditing = false, lo
                 type="text"
                 value={item.subLocation}
                 onChange={(e) => onUpdateField('subLocation', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500"
                 placeholder="e.g., Drawer A"
                 disabled={loading}
               />
@@ -72,7 +72,7 @@ const ItemForm = ({ item, onSave, onCancel, onUpdateField, isEditing = false, lo
             <textarea
               value={item.description}
               onChange={(e) => onUpdateField('description', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-gray-900 placeholder-gray-500"
               rows="3"
               placeholder="Optional description..."
               disabled={loading}
@@ -85,7 +85,7 @@ const ItemForm = ({ item, onSave, onCancel, onUpdateField, isEditing = false, lo
               type="text"
               value={item.tags}
               onChange={(e) => onUpdateField('tags', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500"
               placeholder="e.g., electronics, cables, usb"
               disabled={loading}
             />
@@ -140,7 +140,7 @@ const ItemForm = ({ item, onSave, onCancel, onUpdateField, isEditing = false, lo
 }
 
 export default function HomePage() {
-  const { items, loading, error, addItem, updateItem, deleteItem } = useInventoryItems()
+  const { items, loading, error, addItem, updateItem, deleteItem, refreshData, getCacheInfo } = useInventoryItems()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
@@ -274,13 +274,23 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 relative">
           <h1 className="text-4xl font-bold text-gray-800 mb-4 animate-fadeIn">
             🏠 Home Inventory
           </h1>
           <p className="text-gray-600 text-lg animate-fadeIn" style={{ animationDelay: '0.2s' }}>
             Find anything in your house, instantly
           </p>
+
+          {/* Refresh Button */}
+          <button
+            onClick={refreshData}
+            disabled={loading}
+            className="absolute top-0 right-0 p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 transition-all duration-200 hover:bg-gray-100 rounded-lg"
+            title="Refresh data"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
 
         {/* Search Bar */}
@@ -292,7 +302,7 @@ export default function HomePage() {
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search for items, locations, or tags..."
-              className="w-full pl-12 pr-12 py-4 text-lg border border-gray-200 rounded-2xl shadow-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white/80 backdrop-blur-sm"
+              className="w-full pl-12 pr-12 py-4 text-lg border border-gray-200 rounded-2xl shadow-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500"
             />
             <button
               onClick={() => setShowAddForm(true)}
